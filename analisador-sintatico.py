@@ -8,16 +8,7 @@ tokens = []
 
 tipo_esperado = ""
 
-E_esq = ""
-E_dir = ""
-T_esq = ""
-T_dir = ""
-R_esq = ""
-R_dir = ""
-R1_esq = ""
-R1_dir = ""
-S1_quad = 1
-prox = 2
+prox = 0
 
 temps = [0]
 
@@ -118,7 +109,7 @@ def O(entrada):
 
 
 def S(entrada):
-    global tipo_esperado, E_esq, E_dir, S1_quad, prox, R_dir
+    global prox
     try:
         elemento = entrada[0]
     except:
@@ -135,7 +126,7 @@ def S(entrada):
         entrada = getNext(entrada)
         if (entrada[0][0] == ":="):
             entrada = getNext(entrada)
-            entrada = E(entrada)
+            entrada,E_dir = E(entrada,E_esq)
             print("[:=", E_esq, E_dir,"]")
         else:
             raise NameError("Erro Sintático, esperava-se ':=' na linha", entrada[0][2])
@@ -143,15 +134,14 @@ def S(entrada):
         return entrada
     elif (entrada[0][0] == "if"):
         entrada = getNext(entrada)
-        entrada = E(entrada)
+        S_esq = ""
+        entrada, E_dir = E(entrada,S_esq )
         if (entrada[0][0] == "then"):
-            tipo_esperado = ""
             tipo_esperado = ""
             entrada = getNext(entrada)
             S1_quad = prox
-            prox += 1
             entrada = S(entrada)
-            print(S1_quad,"JF", R_dir, prox)
+            print(S1_quad,"JF", E_dir, prox)
 
             return entrada
         else:
@@ -163,17 +153,16 @@ def S(entrada):
     return entrada
 
 
-def E(entrada):
-    global R_esq, T_dir, E_dir, R_dir
-    entrada = T(entrada)
-    R_esq = T_dir
-    entrada = R(entrada)
+def E(entrada,R_esq):
+    entrada,T_dir = T(entrada)
+    E_esq = T_dir
+    entrada, R_dir = R(entrada, E_esq)
     E_dir = R_dir
-    return entrada
+    return (entrada,E_dir)
 
 
 def T(entrada):
-    global tipo_esperado, T_dir
+    global tipo_esperado
     if (entrada[0][1] == "id"):
         try:
             get_dict = get_ts(entrada[0][0])
@@ -189,31 +178,30 @@ def T(entrada):
                                 % (tipo_esperado, str(entrada[0][2]), str(entrada[0][0])))
 
         entrada = getNext(entrada)
-        return entrada
+        return (entrada, T_dir)
     else:
         raise \
             NameError("Erro Sintático. Esperava-se uma variavel na linha", entrada[0][2])
 
 
-def R(entrada):
-    global R1_esq, T_dir, R_dir,R1_dir,R_esq
+def R(entrada,R_esq):
     try:
         value = entrada[0][0]
     except:
         R_dir = R_esq
-        return entrada
+        return (entrada,E_dir)
 
     if (value == "+"):
         entrada = getNext(entrada)
-        entrada = T(entrada)
+        entrada,T_dir  = T(entrada)
         R1_esq = T_dir
-        entrada = R(entrada)
+        entrada, R1_dir = R(entrada, R1_esq)
         R_dir = geraTemp()
-        print("[+", R_esq, R1_esq, R_dir,"]")
+        print("[+", R_esq, R1_dir, R_dir,"]")
         return entrada
     else:
         R_dir = R_esq
-        return entrada
+        return (entrada , R_dir)
 
 
 

@@ -1,22 +1,20 @@
 var-Palavra reservada-1
-variavel-id-1
-,-Palavra reservada-1
-identificador-id-1
-,-Palavra reservada-1
-vari-id-1
-:-Palavra reservada-1
-integer-Palavra reservada-1
-;-Palavra reservada-1
-valor-id-2
+a-id-2
+,-Palavra reservada-2
+b-id-2
+,-Palavra reservada-2
+c-id-2
 :-Palavra reservada-2
-real-Palavra reservada-2
-if-Palavra reservada-3
-valor-id-3
-+-Operadores-3
-valor-id-3
-then-Palavra reservada-3
-identificador-id-3
-:=-Atribuicao-3
-variavel-id-3
-+-Operadores-3
-teste-id-3
+integer-Palavra reservada-2
+;-Palavra reservada-2
+d-id-3
+:-Palavra reservada-3
+real-Palavra reservada-3
+if-Palavra reservada-4
+a-id-4
++-Operadores-4
+b-id-4
+then-Palavra reservada-4
+a-id-4
+:=-Atribuicao-4
+c-id-4
