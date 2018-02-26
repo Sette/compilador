@@ -1,7 +1,4 @@
-var variavel,identificador,vari:integer;
-valor:real
-if valor+valor then identificador := variavel+teste
-
-
-
-
+var
+ a, b, c: integer;
+ d:real
+if a+b then a := c
