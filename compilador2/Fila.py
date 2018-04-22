@@ -16,3 +16,6 @@ class Fila(object):
 
     def vazia(self):
         return len(self.dados) == 0
+
+    def getList(self):
+        return self.dados

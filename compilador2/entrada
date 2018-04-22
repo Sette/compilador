@@ -1,7 +1,7 @@
-program programa1;
+program programa1
 {1 exemplo de programa}
 var a, a1, b: integer;
-procedure soma(a:integer; b:real)
+procedure soma(a:integer;b:real)
 /* esta eh uma subrotina *** */
 	var c: integer;
 	begin

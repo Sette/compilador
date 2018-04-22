@@ -1,4 +1,4 @@
-from Lexico import Lexico
+from compilador.Lexico import Lexico
 
 import csv
 
