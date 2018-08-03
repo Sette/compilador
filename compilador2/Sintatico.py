@@ -3,13 +3,33 @@ from Token import Token
 
 from Fila import Fila
 
+
+ts = {}
+
+tokens = []
+
+tipo_esperado = ""
+
+prox = 0
+
+
+def get_ts(token):
+    global ts
+    get_dict = ts.get(token)
+
+    if (get_dict == None):
+        raise NameError("Variavel não encontrada: %s" % token.get("Cadeia"))
+
+    return get_dict
+
+
 class Sintatico():
     def __init__(self,tokens):
         self.tokens = tokens
-        self.ts = {}
 
     def analisar(self):
         self.S()
+        print(ts)
 
     def programa(self):
         elemento = self.tokens.remove()
@@ -20,6 +40,10 @@ class Sintatico():
             if not (elemento.classe == "Identificador"):
                 raise NameError("Erro Sintático. Esperava-se um identificador na linha", elemento.linha)
             else:
+                insert_ts = {elemento.cadeia: {"Cadeia": elemento.cadeia, "Token": elemento.classe, "Categoria": "program", \
+                                             "Endereço": elemento.linha}}
+                tokens.append(elemento.cadeia)
+                ts.update(insert_ts)
                 self.corpo()
                 elemento = self.tokens.remove()
                 if elemento.cadeia == ".":
@@ -79,6 +103,10 @@ class Sintatico():
         if not (elemento.classe == "Identificador"):
             raise NameError("Erro Sintático. Esperava-se um identificador na linha", elemento.linha)
         else:
+            insert_ts = {elemento.cadeia: {"Cadeia": elemento.cadeia, "Token": elemento.classe, "Categoria": "var", \
+                                           "Endereço": elemento.linha}}
+            tokens.append(elemento.cadeia)
+            ts.update(insert_ts)
             self.mais_var()
 
     def mais_var(self):
@@ -96,6 +124,10 @@ class Sintatico():
             if not (elemento.classe == "Identificador"):
                 raise NameError("Erro Sintático. Esperava-se um identificador na linha", elemento.linha)
             else:
+                insert_ts = {elemento.cadeia: {"Cadeia": elemento.cadeia, "Token": elemento.classe, "Categoria": "procedure", \
+                                               "Endereço": elemento.linha}}
+                tokens.append(elemento.cadeia)
+                ts.update(insert_ts)
                 self.parametros()
                 self.corpo_p()
 
@@ -165,6 +197,10 @@ class Sintatico():
     def argumentos(self):
         elemento = self.tokens.remove()
         if elemento.classe == "Identificador":
+            try:
+                get_dict = get_ts(elemento.cadeia)
+            except:
+                raise NameError("Variavel não encontrada: %s" % elemento.cadeia)
             self.mais_ident()
         else:
             raise NameError("Erro Sintático. Esperava-se um identificador na linha", elemento.linha)
@@ -222,6 +258,10 @@ class Sintatico():
                 if not (self.tokens.remove().cadeia == "$"):
                     raise NameError("Erro Sintático. Esperava-se '$' na linha", elemento.linha)
         elif(elemento.classe == "Identificador"):
+            try:
+                get_dict = get_ts(elemento.cadeia)
+            except:
+                raise NameError("Variavel não encontrada: %s" % elemento.cadeia)
             self.restoident()
 
         else:
@@ -300,7 +340,13 @@ class Sintatico():
         elemento = self.tokens.peek()
         classes = ["Identificador", "Real", "Inteiro"]
         if not elemento.classe in classes:
+
             self.expressao()
         else:
+            if elemento.classe == "Identificador":
+                try:
+                    get_dict = get_ts(elemento.cadeia)
+                except:
+                    raise NameError("Variavel não encontrada: %s" % elemento.cadeia)
             self.tokens.remove()
 
