@@ -6,6 +6,7 @@ from Fila import Fila
 class Sintatico():
     def __init__(self,tokens):
         self.tokens = tokens
+        self.ts = {}
 
     def analisar(self):
         self.S()

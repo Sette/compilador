@@ -12,6 +12,8 @@ def getToken(w, lista, linha):
     return None
 
 class Lexico():
+    def __init__(self,entrada):
+        self.entrada = entrada
     def analisar(self):
         lista = {'Reservada': ["if", "then", "while", "do", "write",\
             "read", "else", "begin", "end","real","var","procedure","integer","program"], \
@@ -20,7 +22,7 @@ class Lexico():
 
         tokens = Fila()
 
-        fd = open('entrada', 'r')
+        fd = open(self.entrada, 'r')
         stream = fd.readlines()
 
         fila_entrada = Fila()

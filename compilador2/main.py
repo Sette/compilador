@@ -3,7 +3,7 @@ from Lexico import Lexico
 from Sintatico import Sintatico
 
 def main():
-    tokens = Lexico()
+    tokens = Lexico("erro")
     tokens = tokens.analisar()
     lista = tokens.getList()
     #for elemento in lista:
