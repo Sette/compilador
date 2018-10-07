@@ -4,7 +4,6 @@ from Token import Token
 from Fila import Fila
 
 
-ts = {}
 
 tokens = []
 
@@ -12,9 +11,18 @@ tipo_esperado = ""
 
 prox = 0
 
+escopos = [{}]
+
+escopo_atual = 0
+
+variaveis = []
+
+parametros = []
+
 
 def get_ts(token):
-    global ts
+    global escopos, escopo_atual
+    ts = escopos[escopo_atual]
     get_dict = ts.get(token)
 
     if (get_dict == None):
@@ -28,10 +36,15 @@ class Sintatico():
         self.tokens = tokens
 
     def analisar(self):
+        global escopos, escopo_atual
         self.S()
-        print(ts)
+        for escopo in escopos:
+            print("---------------------------------------")
+            print(escopo)
+
 
     def programa(self):
+        global escopos, escopo_atual
         elemento = self.tokens.remove()
         if not (elemento.cadeia == "program"):
             raise NameError("Erro Sintático. Esperava-se 'program' na linha", elemento.linha)
@@ -43,6 +56,9 @@ class Sintatico():
                 insert_ts = {elemento.cadeia: {"Cadeia": elemento.cadeia, "Token": elemento.classe, "Categoria": "program", \
                                              "Endereço": elemento.linha}}
                 tokens.append(elemento.cadeia)
+
+                ts = escopos[escopo_atual]
+
                 ts.update(insert_ts)
                 self.corpo()
                 elemento = self.tokens.remove()
@@ -54,6 +70,7 @@ class Sintatico():
         self.programa()
 
     def corpo(self):
+        global escopos, escopo_atual
         self.dc()
         elemento = self.tokens.remove()
         if not (elemento.cadeia=="begin"):
@@ -67,6 +84,7 @@ class Sintatico():
 
 
     def dc(self):
+        global escopos, escopo_atual
         elemento = self.tokens.peek()
         if elemento.cadeia == "var":
             self.dc_v()
@@ -92,21 +110,40 @@ class Sintatico():
                 raise NameError("Erro Sintático. Esperava-se ':' na linha", elemento.linha)
             else:
                 self.tipo_var()
+                parametros.clear()
 
     def tipo_var(self):
+        global escopos, escopo_atual
         elemento = self.tokens.remove()
         if not (elemento.cadeia == "real" or elemento.cadeia == "integer"):
             raise NameError("Erro Sintático. Esperava-se um tipo de variavel na linha", elemento.linha)
+        else:
+            if not variaveis:
+                print("OPA")
+            else:
+                ts = escopos[escopo_atual]
+                for variavel in variaveis:
+                    insert_ts = variavel[1]
+                    get_dict = insert_ts.get(variavel[0])
+                    get_dict.update({"Tipo":elemento.cadeia})
+                    ts.update(insert_ts)
+                    parametros.append(insert_ts)
+                variaveis.clear()
+
+
 
     def variaveis(self):
+        global variaveis
+        global escopos, escopo_atual, procedures
         elemento = self.tokens.remove()
         if not (elemento.classe == "Identificador"):
             raise NameError("Erro Sintático. Esperava-se um identificador na linha", elemento.linha)
         else:
             insert_ts = {elemento.cadeia: {"Cadeia": elemento.cadeia, "Token": elemento.classe, "Categoria": "var", \
                                            "Endereço": elemento.linha}}
+            variaveis.append((elemento.cadeia,insert_ts))
             tokens.append(elemento.cadeia)
-            ts.update(insert_ts)
+            #ts.update(insert_ts)
             self.mais_var()
 
     def mais_var(self):
@@ -116,6 +153,7 @@ class Sintatico():
             self.variaveis()
 
     def dc_p(self):
+        global escopos, escopo_atual, procedures
         elemento = self.tokens.remove()
         if not (elemento.cadeia == "procedure"):
             raise NameError("Erro Sintático. Esperava-se 'procedure' na linha", elemento.linha)
@@ -127,11 +165,21 @@ class Sintatico():
                 insert_ts = {elemento.cadeia: {"Cadeia": elemento.cadeia, "Token": elemento.classe, "Categoria": "procedure", \
                                                "Endereço": elemento.linha}}
                 tokens.append(elemento.cadeia)
-                ts.update(insert_ts)
+                procedures.append(insert_ts)
+
+                ts = escopos[escopo_atual]
+
+                #ts.update(insert_ts)
+
+                escopo_atual+=1
+
+                escopos.append({})
+
                 self.parametros()
                 self.corpo_p()
 
     def parametros(self):
+
         elemento = self.tokens.peek()
         if not (elemento.cadeia == "("):
             raise NameError("Erro Sintático. Esperava-se '(' na linha", elemento.linha)
@@ -144,12 +192,15 @@ class Sintatico():
 
 
     def lista_par(self):
+        global escopos, escopo_atual, procedures
+        global procedures
         self.variaveis()
         elemento = self.tokens.remove()
         if not (elemento.cadeia == ":"):
             raise NameError("Erro Sintático. Esperava-se ':' linha", elemento.linha)
         else:
             self.tipo_var()
+
             self.mais_par()
 
     def mais_par(self):
@@ -159,6 +210,7 @@ class Sintatico():
            self.lista_par()
 
     def corpo_p(self):
+        global escopos,escopo_atual
         self.dc_loc()
         elemento = self.tokens.remove()
         if not (elemento.cadeia == "begin"):
@@ -168,6 +220,8 @@ class Sintatico():
             elemento = self.tokens.remove()
             if not (elemento.cadeia == "end"):
                 raise NameError("Erro Sintático. Esperava-se 'end' na linha", elemento.linha)
+            else:
+                escopo_atual-=1
 
     def dc_loc(self):
         elemento =  self.tokens.peek()
@@ -349,4 +403,3 @@ class Sintatico():
                 except:
                     raise NameError("Variavel não encontrada: %s" % elemento.cadeia)
             self.tokens.remove()
-
