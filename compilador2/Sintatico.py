@@ -23,7 +23,7 @@ procedures = []
 
 argumentos = []
 
-argumentos_two = []
+verifica_tipo = ""
 
 
 def get_ts(token):
@@ -124,9 +124,7 @@ class Sintatico():
         if not (elemento.cadeia == "real" or elemento.cadeia == "integer"):
             raise NameError("Erro Sintático. Esperava-se um tipo de variavel na linha", elemento.linha)
         else:
-            if not variaveis:
-                print("OPA")
-            else:
+            if variaveis:
                 ts = escopos[escopo_atual]
                 for variavel in variaveis:
                     insert_ts = variavel[1]
@@ -187,23 +185,38 @@ class Sintatico():
                 #ts.update(insert_ts)
 
 
+
                 escopos.append({})
 
                 self.parametros()
                 self.corpo_p()
 
     def parametros(self):
-        global procedures, escopos, parametros
+        global procedures, escopos, parametros, escopo_atual
         elemento = self.tokens.peek()
         if not (elemento.cadeia == "("):
             raise NameError("Erro Sintático. Esperava-se '(' na linha", elemento.linha)
         else:
             self.tokens.remove()
             self.lista_par()
-            escopo = escopos[escopo_atual]
 
+            escopo = escopos[escopo_atual]
             ts = escopos[escopo_atual]
             ts.update(procedures[0])
+            escopo_atual += 1
+            ts = escopos[escopo_atual]
+
+            tokens = []
+            for par in parametros:
+                if (par != "real" and par != "integer"):
+                    insert_ts = {par: {"Cadeia": par, "Token": "id",  "Categoria": "var"}}
+                    ts.update(insert_ts)
+                    tokens.append(par)
+                else:
+                    for token in tokens:
+                        update = ts.get(token)
+                        update.update({"Tipo":par})
+                    tokens.clear()
             procedures.clear()
 
             elemento = self.tokens.remove()
@@ -223,7 +236,6 @@ class Sintatico():
             procedure = procedures[0]
             for p in procedure.values():
                 p.update({"Parametros":parametros})
-                print(p)
             self.mais_par()
 
     def mais_par(self):
@@ -241,6 +253,7 @@ class Sintatico():
         else:
             self.comandos()
             elemento = self.tokens.remove()
+            escopo_atual -= 1
             if not (elemento.cadeia == "end"):
                 raise NameError("Erro Sintático. Esperava-se 'end' na linha", elemento.linha)
 
@@ -325,7 +338,7 @@ class Sintatico():
             self.comandos()
 
     def comando(self):
-        global argumentos
+        global argumentos,verifica_tipo
         elemento = self.tokens.remove()
         if (elemento.cadeia == "read") or (elemento.cadeia == "write"):
             elemento = self.tokens.remove()
@@ -367,7 +380,8 @@ class Sintatico():
                             argumentos.append(cont)
                             argumentos.append(par)
                             cont = 0
-                    print(argumentos)
+                if (get_dict["Categoria"] == "var"):
+                    verifica_tipo = get_dict["Tipo"]
 
             except:
                 raise NameError("Variavel não encontrada: %s" % elemento.cadeia)
@@ -405,8 +419,11 @@ class Sintatico():
 
 
     def expressao(self):
+        global verifica_tipo
         self.termo()
         self.outros_termos()
+        verifica_tipo = ""
+
 
     def op_un(self):
         if self.tokens.peek().cadeia in ["+","-"]:
@@ -417,6 +434,7 @@ class Sintatico():
             self.tokens.remove()
             self.termo()
             self.outros_termos()
+
 
     def op_ad(self):
         elemento = self.tokens.peek()
@@ -446,15 +464,17 @@ class Sintatico():
             raise NameError("Erro Sintático. Esperava-se relacional na linha", elemento.linha)
 
     def fator(self):
+        global verifica_tipo
         elemento = self.tokens.peek()
         classes = ["Identificador", "Real", "Inteiro"]
         if not elemento.classe in classes:
-
             self.expressao()
         else:
             if elemento.classe == "Identificador":
                 try:
                     get_dict = get_ts(elemento.cadeia)
+                    if (verifica_tipo and verifica_tipo != get_dict["Tipo"]):
+                        raise NameError("Tipos incompativeis: %s" % elemento.cadeia)
                 except:
                     raise NameError("Variavel não encontrada: %s" % elemento.cadeia)
             self.tokens.remove()

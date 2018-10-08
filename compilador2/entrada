@@ -1,6 +1,6 @@
 program programa1
 {1 exemplo de programa}
-var a, a1, b: integer;
+var a,d,a1, b: integer;
 var k,j:real;
 procedure soma(a,a1:integer;b:real)
 /* esta eh uma subrotina *** */
@@ -8,13 +8,24 @@ procedure soma(a,a1:integer;b:real)
 	var d: real;
 	begin
     		if (a > b) then
-			c := 3 + a
+				c := 3 + a
     		$;
     		b := 4.3
 	end
+
+procedure subtracao(a,a1:integer;b:real)
+	/* esta eh uma subrotina *** */
+		var c: integer;
+		var d: real;
+		begin
+	    		if (a > b) then
+					c := 3 + a
+	    		$;
+	    		b := 4.3
+		end
 begin
     read(a);
-    a1:= a1 * 2.3444;
+    a1:= a * 2.3444;
     while (a1>0)do
         write(a1);
         a1:=a1-1
@@ -24,6 +35,6 @@ begin
         a:=a-1;
         b:=b+1
     $;
-    soma(d;a1;b)
+    soma(a;a1;k)
 end
 .
