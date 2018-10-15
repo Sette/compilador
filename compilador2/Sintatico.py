@@ -231,7 +231,6 @@ class Sintatico():
 
     def lista_par(self):
         global escopos, escopo_atual, procedures, parametros
-        global procedures
         self.variaveis()
         elemento = self.tokens.remove()
         if not (elemento.cadeia == ":"):
@@ -296,6 +295,9 @@ class Sintatico():
             try:
                 get_dict = get_ts(elemento.cadeia)
 
+                print(argumentos)
+
+                '''
                 if (argumentos):
                     idx = 0
                     for arg in argumentos:
@@ -312,7 +314,7 @@ class Sintatico():
                     if(argumentos[0] == 0):
                         argumentos.remove(0)
                         argumentos.remove(verifica)
-
+                '''
 
 
             except:
@@ -379,6 +381,7 @@ class Sintatico():
                 get_dict = get_ts(elemento.cadeia)
                 if (get_dict["Categoria"] == "procedure"):
                     cont = 0;
+                    print()
                     for par in get_dict["Parametros"]:
                         if par != "real" and par != "integer":
                             cont+=1

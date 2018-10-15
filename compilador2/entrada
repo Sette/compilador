@@ -12,7 +12,7 @@ procedure soma(a,a1:integer;b:real)
     		$;
     		b := 4.3
 	end;
-procedure sub(a,a1:integer;b:real)
+procedure sub(a,a1:integer;b,k:real)
 	/* esta eh uma subrotina *** */
 		var c: integer;
 		var d: real;
@@ -35,6 +35,7 @@ begin
         a:=a-1;
         b:=b+1
     $;
-    soma(a;a1;k)
+		soma(a;a1;k);
+    sub(a;a1;k;j)
 end
 .
