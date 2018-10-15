@@ -130,10 +130,11 @@ class Sintatico():
             if variaveis:
                 ts = escopos.get(escopo_atual)
                 for variavel in variaveis:
-                    insert_ts = variavel[1]
-                    get_dict = insert_ts.get(variavel[0])
-                    get_dict.update({"Tipo":elemento.cadeia})
-                    ts.update(insert_ts)
+                    if variavel[0] not in parametros:
+                        insert_ts = variavel[1]
+                        get_dict = insert_ts.get(variavel[0])
+                        get_dict.update({"Tipo":elemento.cadeia})
+                        ts.update(insert_ts)
                 if procedures:
                     parametros.append(elemento.cadeia)
 
@@ -150,6 +151,8 @@ class Sintatico():
         else:
             insert_ts = {elemento.cadeia: {"Cadeia": elemento.cadeia, "Token": elemento.classe,  \
                                            "Endereço": elemento.linha,"Categoria": "var",}}
+
+
             variaveis.append((elemento.cadeia,insert_ts))
             tokens.append(elemento.cadeia)
 
@@ -204,8 +207,6 @@ class Sintatico():
             self.lista_par()
 
             ts = escopos.get(escopo_atual)
-            ts.update(procedures[0])
-
 
 
             escopo_atual = prox_escopo
@@ -236,8 +237,6 @@ class Sintatico():
             parametros.clear()
 
             elemento = self.tokens.remove()
-
-            #UPDATE HERE
 
             if not (elemento.cadeia == ")"):
                 raise NameError("Erro Sintático. Esperava-se ')' na linha", elemento.linha)
