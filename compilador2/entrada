@@ -12,13 +12,15 @@ procedure soma(a,a1:integer;b:real)
     		$;
     		b := 4.3
 	end;
-procedure sub(a,a1:integer;b,k:real)
+
+
+procedure sub(t,a1:integer;b,k:real)
 	/* esta eh uma subrotina *** */
 		var c: integer;
 		var d: real;
 		begin
-	    		if (a > b) then
-					c := 3 - a
+	    		if (t > b) then
+					c := 3 - t
 	    		$;
 	    		b := 4.3
 		end

@@ -207,7 +207,7 @@ class Sintatico():
             ts.update(procedures[0])
 
 
-            #Mudar escopo aqui, porra rs
+
             escopo_atual = prox_escopo
             ts = escopos.get(escopo_atual)
 
@@ -222,9 +222,23 @@ class Sintatico():
                         update = ts.get(token)
                         update.update({"Tipo":par})
                     tokens.clear()
+
+            procedure = procedures[0]
+            for name in procedure:
+                nome = name
+                procedure[name].update({"Parametros": parametros[:]})
+
+            ts = escopos.get("main")
+
+            ts.update(procedure)
+
             procedures.clear()
+            parametros.clear()
 
             elemento = self.tokens.remove()
+
+            #UPDATE HERE
+
             if not (elemento.cadeia == ")"):
                 raise NameError("Erro Sintático. Esperava-se ')' na linha", elemento.linha)
 
@@ -237,9 +251,6 @@ class Sintatico():
             raise NameError("Erro Sintático. Esperava-se ':' linha", elemento.linha)
         else:
             self.tipo_var()
-            procedure = procedures[0]
-            for p in procedure.values():
-                p.update({"Parametros":parametros})
             self.mais_par()
 
     def mais_par(self):
@@ -295,9 +306,7 @@ class Sintatico():
             try:
                 get_dict = get_ts(elemento.cadeia)
 
-                print(argumentos)
 
-                '''
                 if (argumentos):
                     idx = 0
                     for arg in argumentos:
@@ -314,8 +323,6 @@ class Sintatico():
                     if(argumentos[0] == 0):
                         argumentos.remove(0)
                         argumentos.remove(verifica)
-                '''
-
 
             except:
                 raise NameError("Variavel não encontrada: %s" % elemento.cadeia)
@@ -324,10 +331,15 @@ class Sintatico():
             raise NameError("Erro Sintático. Esperava-se um identificador na linha", elemento.linha)
 
     def mais_ident(self):
+        global argumentos
         elemento = self.tokens.peek()
         if elemento.cadeia == ";":
             self.tokens.remove()
             self.argumentos()
+
+        if (argumentos):
+            print(argumentos)
+            raise NameError("Quantidade incorreta de parametros")
 
     def pfalsa(self):
         elemento = self.tokens.peek()
@@ -381,7 +393,7 @@ class Sintatico():
                 get_dict = get_ts(elemento.cadeia)
                 if (get_dict["Categoria"] == "procedure"):
                     cont = 0;
-                    print()
+                    argumentos.clear()
                     for par in get_dict["Parametros"]:
                         if par != "real" and par != "integer":
                             cont+=1
