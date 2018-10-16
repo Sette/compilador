@@ -26,6 +26,8 @@ verifica_tipo = ""
 
 comando = False
 
+procedure = False
+
 
 
 def get_ts(token):
@@ -367,7 +369,7 @@ class Sintatico():
             self.comandos()
 
     def comando(self):
-        global argumentos,verifica_tipo
+        global argumentos,verifica_tipo, procedure
         global variaveis
         elemento = self.tokens.remove()
         if (elemento.cadeia == "read") or (elemento.cadeia == "write"):
@@ -408,6 +410,7 @@ class Sintatico():
             try:
                 get_dict = get_ts(elemento.cadeia)
                 if (get_dict["Categoria"] == "procedure"):
+                    procedure = True
                     cont = 0;
                     argumentos.clear()
                     for par in get_dict["Parametros"]:
@@ -440,7 +443,11 @@ class Sintatico():
             self.tokens.remove()
             self.expressao()
         else:
-            self.lista_arg()
+            if procedure:
+                self.lista_arg()
+                procedure = False
+            else:
+                raise NameError("Tipo de identificador inesperado")
 
     def condicao(self):
         elemento = self.tokens.peek()
