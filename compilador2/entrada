@@ -5,13 +5,15 @@ var k,j:real;
 
 procedure sub(t,a1:integer;b,k:real)
 	/* esta eh uma subrotina *** */
-		var c: integer;
+	    var a :real;
+		var a1: integer;
 		var d: real;
 		begin
-	    		if (t > b) then
-					c := 3 - t
+	    		if (k > b) then
+					a1 := 3 - t
 	    		$;
 	    		b := 4.3
+
 		end;
 
 
@@ -25,12 +27,10 @@ procedure soma(a,a1:integer;b:real)
     		$;
     		b := 4.3
 	end
-
-
 begin
     read(a);
-    a1:= a * 2.3444;
-    while (a1>0)do
+    a1:= a * 2;
+    while (a > 1)do
         write(a1);
         a1:=a1-1
     $;
