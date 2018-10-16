@@ -26,7 +26,6 @@ verifica_tipo = ""
 
 comando = False
 
-procedure = False
 
 
 def get_ts(token):
@@ -125,8 +124,7 @@ class Sintatico():
 
 
     def tipo_var(self):
-        global escopos, escopo_atual, parametros, procedure
-        procedure = True
+        global escopos, escopo_atual, parametros
         elemento = self.tokens.remove()
         if not (elemento.cadeia == "real" or elemento.cadeia == "integer"):
             raise NameError("Erro Sintático. Esperava-se um tipo de variavel na linha", elemento.linha)
@@ -137,6 +135,10 @@ class Sintatico():
                     if variavel[0] not in parametros:
                         insert_ts = variavel[1]
                         get_dict = insert_ts.get(variavel[0])
+
+                        if (ts.get(variavel[0])):
+                            raise NameError("Erro na redeclaração de variaveis", variavel[0])
+
                         get_dict.update({"Tipo":elemento.cadeia})
                         ts.update(insert_ts)
                 if procedures:
@@ -147,7 +149,7 @@ class Sintatico():
 
 
     def variaveis(self):
-        global variaveis, parametros, procedure
+        global variaveis, parametros
         global escopos, escopo_atual, procedures, comando
         elemento = self.tokens.remove()
         if not (elemento.classe == "Identificador"):
@@ -156,9 +158,6 @@ class Sintatico():
             insert_ts = {elemento.cadeia: {"Cadeia": elemento.cadeia, "Token": elemento.classe,  \
                                            "Endereço": elemento.linha,"Categoria": "var",}}
 
-
-            if (not procedure and elemento.cadeia in tokens ):
-                raise NameError("Variável já cadastrada", elemento.cadeia)
 
             variaveis.append((elemento.cadeia,insert_ts))
             tokens.append(elemento.cadeia)
@@ -206,7 +205,7 @@ class Sintatico():
                 self.corpo_p()
 
     def parametros(self):
-        global procedures, procedure, escopos, parametros, escopo_atual, prox_escopo
+        global procedures, escopos, parametros, escopo_atual, prox_escopo
         elemento = self.tokens.peek()
         if not (elemento.cadeia == "("):
             raise NameError("Erro Sintático. Esperava-se '(' na linha", elemento.linha)
@@ -219,7 +218,7 @@ class Sintatico():
 
             escopo_atual = prox_escopo
             ts = escopos.get(escopo_atual)
-            ts.update(ts_old)
+            #ts.update(ts_old)
 
             tokens = []
             for par in parametros:
@@ -246,7 +245,6 @@ class Sintatico():
             parametros.clear()
 
             elemento = self.tokens.remove()
-            procedure = False
             if not (elemento.cadeia == ")"):
                 raise NameError("Erro Sintático. Esperava-se ')' na linha", elemento.linha)
 
@@ -369,14 +367,13 @@ class Sintatico():
             self.comandos()
 
     def comando(self):
-        global argumentos,verifica_tipo, procedure
+        global argumentos,verifica_tipo
         global variaveis
         elemento = self.tokens.remove()
         if (elemento.cadeia == "read") or (elemento.cadeia == "write"):
             elemento = self.tokens.remove()
             if elemento.cadeia == "(":
                 self.variaveis()
-                print(variaveis)
 
                 for var in variaveis:
                     v = var[0]
@@ -411,7 +408,6 @@ class Sintatico():
             try:
                 get_dict = get_ts(elemento.cadeia)
                 if (get_dict["Categoria"] == "procedure"):
-                    procedure = True
                     cont = 0;
                     argumentos.clear()
                     for par in get_dict["Parametros"]:
@@ -425,7 +421,13 @@ class Sintatico():
                     verifica_tipo = get_dict["Tipo"]
 
             except:
-                raise NameError("Variavel não encontrada: %s" % elemento.cadeia)
+
+                if (escopo_atual != "main"):
+                    ts = escopos["main"]
+                    if (ts.get(elemento.cadeia)):
+                        pass
+                    else:
+                        raise NameError("Variavel não encontrada: %s" % elemento.cadeia)
             self.restoident()
 
         else:
@@ -438,10 +440,7 @@ class Sintatico():
             self.tokens.remove()
             self.expressao()
         else:
-            if procedure:
-                self.lista_arg()
-            else:
-                raise NameError("Tipo inesperado")
+            self.lista_arg()
 
     def condicao(self):
         elemento = self.tokens.peek()

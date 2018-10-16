@@ -1,15 +1,15 @@
 program programa1
 {1 exemplo de programa}
 var a,d,a1, b: integer;
-var k,j:real;
+var k,j,p:real;
 
-procedure sub(t,a1:integer;b,k:real)
+procedure sub(t,a1,teste:integer;b,k:real)
 	/* esta eh uma subrotina *** */
-	    var a :real;
-		var a1: integer;
+	    var p: integer;
 		var d: real;
 		begin
 	    		if (k > b) then
+	    		    p := 3;
 					a1 := 3 - t
 	    		$;
 	    		b := 4.3
@@ -40,6 +40,6 @@ begin
         b:=b+1
     $;
 		soma(a;a1;k);
-    sub(a;a1;k;j)
+    sub(a;a;a1;k;j)
 end
 .
