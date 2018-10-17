@@ -10,6 +10,7 @@ def main():
     #    print(elemento.cadeia)
     sintatico = Sintatico(tokens)
     sintatico.analisar()
+    print("Inicio de tradução")
 
 
 if __name__=="__main__":
